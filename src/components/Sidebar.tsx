@@ -38,13 +38,13 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
       
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 h-full bg-sidebar shadow-lg z-50 transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        w-64 lg:translate-x-0 lg:static lg:shadow-none lg:border-r
+        w-64 lg:translate-x-0 lg:static lg:shadow-none lg:border-r lg:border-sidebar-border
       `}>
-        <div className="p-6 border-b">
+        <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-green-600">CookMate</h2>
+            <h2 className="text-2xl font-bold text-primary">CookMate</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -65,8 +65,8 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
                   className={({ isActive }) => `
                     flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
                     ${isActive 
-                      ? 'bg-green-100 text-green-700 font-medium' 
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-sidebar-accent text-sidebar-primary font-medium' 
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
                     }
                   `}
                   onClick={() => window.innerWidth < 1024 && onToggle()}

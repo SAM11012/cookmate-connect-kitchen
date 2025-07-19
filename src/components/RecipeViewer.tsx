@@ -1,180 +1,223 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useMemo } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Clock, 
-  Users, 
-  ChefHat, 
-  Flame, 
-  Play, 
-  Share,
-  Heart,
-  MessageSquare
-} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Clock, Users, ChefHat, ExternalLink, Search, MessageSquare, Play, Share, Heart, Flame } from 'lucide-react';
 
 const RecipeViewer = () => {
-  // Mock recipe data
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCuisine, setSelectedCuisine] = useState('');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('');
+
   const recipes = [
     {
       id: 1,
       name: 'Butter Chicken',
       cuisine: 'North Indian',
-      cookTime: '45 mins',
-      serves: '4 people',
+      ingredients: ['Chicken', 'Tomatoes', 'Cream', 'Spices', 'Butter'],
+      instructions: ['Marinate chicken', 'Cook in tomato gravy', 'Add cream and simmer'],
+      cookingTime: '25 minutes',
+      difficulty: 'Medium',
+      serves: 4,
       spiceLevel: 'Medium',
-      difficulty: 'Intermediate',
-      ingredients: [
-        '500g chicken (cut into pieces)',
-        '1 cup tomato puree',
-        '1/2 cup heavy cream',
-        '2 tbsp butter',
-        '1 tsp garam masala',
-        '1 tsp red chili powder',
-        '1 tbsp ginger-garlic paste',
-        'Salt to taste'
-      ],
-      instructions: [
-        'Marinate chicken with yogurt, ginger-garlic paste, and spices for 30 minutes',
-        'Heat butter in a pan and cook marinated chicken until 80% done',
-        'In the same pan, add tomato puree and cook for 5 minutes',
-        'Add cream, garam masala, and remaining spices',
-        'Add cooked chicken back to the pan and simmer for 10 minutes',
-        'Garnish with fresh coriander and serve hot with rice or naan'
-      ],
-      youtubeUrl: 'https://youtube.com/watch?v=example',
-      image: '/placeholder.svg'
+      youtubeUrl: 'https://youtube.com/watch?v=example'
     },
     {
       id: 2,
       name: 'Masala Dosa',
       cuisine: 'South Indian',
-      cookTime: '30 mins',
-      serves: '2 people',
-      spiceLevel: 'Low',
+      ingredients: ['Dosa batter', 'Potatoes', 'Onions', 'Spices'],
+      instructions: ['Prepare potato filling', 'Make dosa', 'Add filling and fold'],
+      cookingTime: '30 minutes',
       difficulty: 'Easy',
-      ingredients: [
-        '2 cups dosa batter',
-        '2 medium potatoes (boiled)',
-        '1 onion (chopped)',
-        '1 tsp mustard seeds',
-        '1 tsp cumin seeds',
-        'Curry leaves',
-        '1 tsp turmeric powder',
-        'Oil for cooking'
-      ],
-      instructions: [
-        'Heat oil in a pan, add mustard seeds and cumin seeds',
-        'Add chopped onions and curry leaves, cook until onions turn golden',
-        'Add boiled potatoes, turmeric powder, and salt. Mix well',
-        'Heat a non-stick pan and pour dosa batter, spread evenly',
-        'Cook until the bottom turns golden brown',
-        'Add potato filling on one side and fold the dosa',
-        'Serve hot with coconut chutney and sambar'
-      ],
-      youtubeUrl: 'https://youtube.com/watch?v=example2',
-      image: '/placeholder.svg'
+      serves: 2,
+      spiceLevel: 'Low',
+      youtubeUrl: 'https://youtube.com/watch?v=example2'
+    },
+    {
+      id: 3,
+      name: 'Chicken Curry',
+      cuisine: 'North Indian',
+      ingredients: ['Chicken', 'Onions', 'Tomatoes', 'Spices', 'Coconut milk'],
+      instructions: ['Marinate chicken', 'Sauté onions', 'Add tomatoes and spices', 'Add chicken and simmer', 'Finish with coconut milk'],
+      cookingTime: '45 minutes',
+      difficulty: 'Hard',
+      serves: 4,
+      spiceLevel: 'High',
+      youtubeUrl: 'https://youtube.com/watch?v=example3'
+    },
+    {
+      id: 4,
+      name: 'Pasta Carbonara',
+      cuisine: 'Italian',
+      ingredients: ['Pasta', 'Eggs', 'Bacon', 'Parmesan cheese', 'Black pepper'],
+      instructions: ['Cook pasta', 'Fry bacon', 'Mix eggs and cheese', 'Combine with hot pasta', 'Season with pepper'],
+      cookingTime: '20 minutes',
+      difficulty: 'Medium',
+      serves: 3,
+      spiceLevel: 'Low',
+      youtubeUrl: 'https://youtube.com/watch?v=example4'
     }
   ];
 
+  const cuisines = [...new Set(recipes.map(recipe => recipe.cuisine))];
+  const difficulties = [...new Set(recipes.map(recipe => recipe.difficulty))];
+
+  const filteredRecipes = useMemo(() => {
+    return recipes.filter(recipe => {
+      const matchesSearch = recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.ingredients.some(ingredient => ingredient.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCuisine = selectedCuisine === '' || recipe.cuisine === selectedCuisine;
+      const matchesDifficulty = selectedDifficulty === '' || recipe.difficulty === selectedDifficulty;
+      
+      return matchesSearch && matchesCuisine && matchesDifficulty;
+    });
+  }, [searchTerm, selectedCuisine, selectedDifficulty]);
+
   const handleSendToWhatsApp = (recipe: any) => {
     console.log('Sending recipe to WhatsApp:', recipe.name);
-    // Implementation for WhatsApp integration
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Recipe Collection</h1>
-        <Button className="bg-green-600 hover:bg-green-700">
-          <ChefHat className="h-4 w-4 mr-2" />
-          Add New Recipe
-        </Button>
-      </div>
+    <div className="min-h-screen bg-background py-4 px-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">Recipe Collection</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Discover delicious recipes perfect for your preferences. Each recipe includes detailed instructions and video tutorials.
+          </p>
+        </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {recipes.map((recipe) => (
-          <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="aspect-video bg-gradient-to-br from-orange-100 to-green-100 flex items-center justify-center">
-              <ChefHat className="h-16 w-16 text-green-600" />
+        {/* Search and Filter Section */}
+        <div className="mb-8 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search recipes or ingredients..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">{recipe.name}</CardTitle>
-                <Button variant="ghost" size="sm">
-                  <Heart className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">{recipe.cuisine}</Badge>
-                <Badge variant="outline">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {recipe.cookTime}
-                </Badge>
-                <Badge variant="outline">
-                  <Users className="h-3 w-3 mr-1" />
-                  {recipe.serves}
-                </Badge>
-                <Badge variant="outline">
-                  <Flame className="h-3 w-3 mr-1" />
-                  {recipe.spiceLevel}
-                </Badge>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Ingredients:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {recipe.ingredients.slice(0, 4).map((ingredient, idx) => (
-                    <li key={idx}>• {ingredient}</li>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Select value={selectedCuisine} onValueChange={setSelectedCuisine}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectValue placeholder="Cuisine" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Cuisines</SelectItem>
+                  {cuisines.map(cuisine => (
+                    <SelectItem key={cuisine} value={cuisine}>{cuisine}</SelectItem>
                   ))}
-                  {recipe.ingredients.length > 4 && (
-                    <li className="text-green-600 font-medium">
-                      +{recipe.ingredients.length - 4} more ingredients
-                    </li>
-                  )}
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Instructions:</h4>
-                <ol className="text-sm text-gray-600 space-y-1">
-                  {recipe.instructions.slice(0, 3).map((step, idx) => (
-                    <li key={idx}>{idx + 1}. {step}</li>
+                </SelectContent>
+              </Select>
+              <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectValue placeholder="Difficulty" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Levels</SelectItem>
+                  {difficulties.map(difficulty => (
+                    <SelectItem key={difficulty} value={difficulty}>{difficulty}</SelectItem>
                   ))}
-                  {recipe.instructions.length > 3 && (
-                    <li className="text-green-600 font-medium">
-                      +{recipe.instructions.length - 3} more steps
-                    </li>
-                  )}
-                </ol>
-              </div>
-              
-              <div className="flex gap-2 pt-4">
-                <Button 
-                  onClick={() => handleSendToWhatsApp(recipe)}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Send to Cook
-                </Button>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRecipes.length > 0 ? (
+            filteredRecipes.map((recipe) => (
+              <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                  <ChefHat className="h-16 w-16 text-primary" />
+                </div>
                 
-                <Button variant="outline" size="sm">
-                  <Play className="h-4 w-4 mr-2" />
-                  Tutorial
-                </Button>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">{recipe.name}</CardTitle>
+                    <Button variant="ghost" size="sm">
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">{recipe.cuisine}</Badge>
+                    <Badge variant="outline">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {recipe.cookingTime}
+                    </Badge>
+                    <Badge variant="outline">
+                      <Users className="h-3 w-3 mr-1" />
+                      {recipe.serves}
+                    </Badge>
+                    <Badge variant="outline">
+                      <Flame className="h-3 w-3 mr-1" />
+                      {recipe.spiceLevel}
+                    </Badge>
+                  </div>
+                </CardHeader>
                 
-                <Button variant="outline" size="sm">
-                  <Share className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Ingredients:</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      {recipe.ingredients.slice(0, 4).map((ingredient, idx) => (
+                        <li key={idx}>• {ingredient}</li>
+                      ))}
+                      {recipe.ingredients.length > 4 && (
+                        <li className="text-primary font-medium">
+                          +{recipe.ingredients.length - 4} more ingredients
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Instructions:</h4>
+                    <ol className="text-sm text-muted-foreground space-y-1">
+                      {recipe.instructions.slice(0, 3).map((step, idx) => (
+                        <li key={idx}>{idx + 1}. {step}</li>
+                      ))}
+                      {recipe.instructions.length > 3 && (
+                        <li className="text-primary font-medium">
+                          +{recipe.instructions.length - 3} more steps
+                        </li>
+                      )}
+                    </ol>
+                  </div>
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      onClick={() => handleSendToWhatsApp(recipe)}
+                      className="flex-1"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Send to Cook
+                    </Button>
+                    
+                    <Button variant="outline" size="sm">
+                      <Play className="h-4 w-4 mr-2" />
+                      Tutorial
+                    </Button>
+                    
+                    <Button variant="outline" size="sm">
+                      <Share className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground text-lg">No recipes found matching your search criteria.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

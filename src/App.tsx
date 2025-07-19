@@ -10,6 +10,7 @@ import TenantOnboarding from "./components/TenantOnboarding";
 import CookRegistration from "./components/CookRegistration";
 import Dashboard from "./components/Dashboard";
 import RecipeViewer from "./components/RecipeViewer";
+import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/onboarding" element={<TenantOnboarding />} />
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
