@@ -12,6 +12,7 @@ import Dashboard from "./components/Dashboard";
 import RecipeViewer from "./components/RecipeViewer";
 import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
+import OnboardingInfo from "./components/OnboardingInfo";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/onboarding" element={<TenantOnboarding />} />
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/onboarding-info" element={<OnboardingInfo />} />
             <Route path="/tenants" element={<TenantOnboarding />} />
             <Route path="/cooks" element={<CookRegistration />} />
             <Route path="/recipes" element={<RecipeViewer />} />
