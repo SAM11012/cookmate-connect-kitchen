@@ -1,26 +1,61 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChefHat, Mail, Lock, User } from 'lucide-react';
+import { auth, googleProvider } from '@/firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from 'firebase/auth';
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This is where you'd integrate with your authentication system
-    console.log(isSignUp ? 'Sign Up' : 'Sign In', { email, password, name });
+    setError(null);
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        if (auth.currentUser && name) {
+          await updateProfile(auth.currentUser, { displayName: name });
+        }
+        navigate("/dashboard");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleAuth = () => {
-    // This is where you'd integrate with Google OAuth
-    console.log('Google Auth');
+  const handleGoogleAuth = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Google authentication failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,11 +94,12 @@ const AuthPage = () => {
                       onChange={(e) => setName(e.target.value)}
                       className="pl-10"
                       required
+                      disabled={loading}
                     />
                   </div>
                 </div>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -76,10 +112,11 @@ const AuthPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -92,12 +129,17 @@ const AuthPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
-              
-              <Button type="submit" className="w-full" size="lg">
-                {isSignUp ? 'Create Account' : 'Sign In'}
+
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
+
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? (isSignUp ? 'Creating...' : 'Signing in...') : isSignUp ? 'Create Account' : 'Sign In'}
               </Button>
             </form>
             
@@ -117,6 +159,7 @@ const AuthPage = () => {
               className="w-full" 
               size="lg"
               onClick={handleGoogleAuth}
+              disabled={loading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -136,7 +179,7 @@ const AuthPage = () => {
                   fill="#EA4335"
                 />
               </svg>
-              Continue with Google
+              {loading ? "Loading..." : "Continue with Google"}
             </Button>
             
             <div className="text-center">
